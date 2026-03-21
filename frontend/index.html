@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICT Trading Bot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- ── Top header ────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="dot"></div>
+    ICT Trading Bot
+  </div>
+
+  <span class="badge badge-paper" id="mode-badge">PAPER</span>
+
+  <select id="broker-select">
+    <option value="mock">Mock (synthetic)</option>
+    <option value="delta">Delta Exchange</option>
+    <option value="upstox">Upstox</option>
+  </select>
+
+  <div class="topbar-spacer"></div>
+
+  <div class="spinner" id="scan-spin"></div>
+  <button class="btn btn-success" id="scan-btn">▶ Scan Signal</button>
+</header>
+
+<!-- ── Toast container ───────────────────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ── Main layout ───────────────────────────────────────────────────── -->
+<div class="main-layout">
+
+  <!-- ── Stat cards ──────────────────────────────────────────────────── -->
+  <div class="stats-row">
+
+    <div class="stat-card">
+      <div class="stat-label">Balance</div>
+      <div class="stat-value text-blue" id="stat-balance">—</div>
+      <div class="stat-sub">Paper trading account</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Total P&amp;L</div>
+      <div class="stat-value" id="stat-pnl">—</div>
+      <div class="stat-sub" id="stat-pnl-abs">—</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Open Positions</div>
+      <div class="stat-value text-blue" id="stat-open">0</div>
+      <div class="stat-sub">Active trades</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Win Rate</div>
+      <div class="stat-value" id="stat-winrate">—</div>
+      <div class="stat-sub">From last backtest</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Max Drawdown</div>
+      <div class="stat-value text-yellow" id="stat-maxdd">—</div>
+      <div class="stat-sub">From last backtest</div>
+    </div>
+
+  </div><!-- /stats-row -->
+
+
+  <!-- ── Middle row: equity chart + signal ───────────────────────────── -->
+  <div class="mid-row">
+
+    <!-- Equity curve card -->
+    <div class="card">
+      <div class="card-header">
+        <span>Equity Curve</span>
+        <span class="section-title" style="font-size:11px;color:var(--muted)">Paper balance over time</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="equityChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Signal panel -->
+    <div class="card signal-panel">
+      <div class="card-header">
+        <span>ICT Signal</span>
+        <span class="section-title" style="font-size:11px">5/5 confluences</span>
+      </div>
+
+      <!-- Direction badge -->
+      <div class="signal-direction" id="signal-direction">
+        <span class="signal-dir-badge dir-none">Scanning…</span>
+      </div>
+
+      <!-- Entry / SL / TP -->
+      <div class="signal-prices">
+        <div class="signal-price-cell">
+          <div class="signal-price-label">Entry</div>
+          <div class="signal-price-val text-blue" id="sig-entry">—</div>
+        </div>
+        <div class="signal-price-cell">
+          <div class="signal-price-label">Stop Loss</div>
+          <div class="signal-price-val text-red" id="sig-sl">—</div>
+        </div>
+        <div class="signal-price-cell">
+          <div class="signal-price-label">Take Profit</div>
+          <div class="signal-price-val text-green" id="sig-tp">—</div>
+        </div>
+      </div>
+
+      <!-- ICT checklist -->
+      <div class="checklist" id="checklist"></div>
+
+      <!-- Reason text -->
+      <div class="signal-reason" id="signal-reason">No active setup.</div>
+    </div>
+
+  </div><!-- /mid-row -->
+
+
+  <!-- ── Bottom row: backtest + trade log ────────────────────────────── -->
+  <div class="bottom-row">
+
+    <!-- Backtest panel -->
+    <div class="card">
+      <div class="card-header">
+        <span>Backtest Engine</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="spinner" id="bt-spin"></div>
+          <button class="btn btn-primary" id="bt-run-btn">▶ Run</button>
+        </div>
+      </div>
+
+      <!-- Type tabs -->
+      <div class="bt-type-tabs">
+        <button class="tab-btn active" data-tab="synthetic">Synthetic</button>
+        <button class="tab-btn" data-tab="real">Real Data</button>
+      </div>
+
+      <!-- Shared params -->
+      <div class="bt-controls">
+        <div class="field-group" id="bt-trials-row">
+          <label class="field-label">Trials</label>
+          <input class="field-input" id="bt-trials" type="number" value="500" min="50" max="5000" />
+        </div>
+        <div class="field-group" id="bt-winrate-row">
+          <label class="field-label">Win Rate %</label>
+          <input class="field-input" id="bt-winrate" type="number" value="58" min="10" max="90" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">R:R Ratio</label>
+          <input class="field-input" id="bt-rr" type="number" value="2.0" min="0.5" step="0.5" />
+        </div>
+        <div class="field-group" style="grid-column:1">
+          <label class="field-label">Risk % / trade</label>
+          <input class="field-input" id="bt-risk" type="number" value="1.0" min="0.1" max="5" step="0.1" />
+        </div>
+      </div>
+
+      <!-- Real data extra options -->
+      <div class="bt-real-options" id="bt-real-opts">
+        <div class="field-group">
+          <label class="field-label">Broker</label>
+          <select class="field-input" id="bt-real-broker">
+            <option value="delta">Delta Exchange</option>
+            <option value="upstox">Upstox</option>
+            <option value="mock">Mock</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Symbol</label>
+          <input class="field-input" id="bt-real-symbol" type="text" value="BTCUSD" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Interval</label>
+          <select class="field-input" id="bt-real-interval">
+            <option value="4h">4h</option>
+            <option value="1h">1h</option>
+            <option value="1d">1d</option>
+            <option value="15m">15m</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Status line -->
+      <div class="bt-run-row">
+        <span class="bt-status" id="bt-status">Click ▶ Run to start a backtest.</span>
+      </div>
+
+      <!-- Results grid -->
+      <div class="bt-results-grid" id="bt-result-grid">
+        <div class="bt-metric" style="grid-column:1/-1">
+          <div class="bt-metric-label">Status</div>
+          <div class="bt-metric-val" style="color:var(--muted)">Not run yet</div>
+        </div>
+      </div>
+
+    </div><!-- /backtest card -->
+
+
+    <!-- Trade log -->
+    <div class="card">
+      <div class="card-header">
+        <span>Trade Log</span>
+        <span class="section-title" style="font-size:11px;color:var(--muted)">Last 100 paper trades</span>
+      </div>
+      <div class="trade-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Dir</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th>P&amp;L</th>
+              <th>Qty</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody id="trades-tbody">
+            <tr><td colspan="7" class="empty-state">No trades yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /trade log -->
+
+  </div><!-- /bottom-row -->
+
+</div><!-- /main-layout -->
+
+<script src="/static/app.js"></script>
+</body>
+</html>
