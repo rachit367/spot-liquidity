@@ -49,7 +49,7 @@ if not exist ".env" (
 echo  [START] Dashboard starting at http://localhost:8001
 echo  [INFO]  Press Ctrl+C to stop.
 echo.
-start "" "http://localhost:8001"
-python run_server.py --port 8001
+start "" "http://localhost:8303"
+python run_server.py --port 8303
 
 pause
