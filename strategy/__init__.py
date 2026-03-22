@@ -66,7 +66,8 @@ class ICTStrategy(BaseStrategy):
     interval     : OHLC candle interval forwarded to broker (e.g. ``"15m"``)
     swing_length : Candles on each side used to identify swing highs/lows
     ob_lookback  : How many recent candles to search for order blocks / FVGs
-    kill_zones   : Subset of KILL_ZONES keys to respect (None = all three)
+    kill_zones   : Subset of KILL_ZONES keys to respect (empty list = any time;
+                   None = ["london_open", "ny_open"])
     rr_ratio     : Minimum reward-to-risk ratio; trade skipped if not met
     """
 

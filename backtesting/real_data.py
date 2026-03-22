@@ -19,6 +19,7 @@ import pandas as pd
 
 from backtesting import (
     TradeRecord,
+    _run_strategy_on_window,
     _simulate_exit,
     compute_metrics,
     print_report,
@@ -26,7 +27,7 @@ from backtesting import (
 from brokers import get_broker
 from brokers.base import BrokerAPIError
 from execution.risk_manager import RiskManager
-from strategy import ICTStrategy, _prepare, _price_in_zone
+from strategy import ICTStrategy, _prepare
 
 logger = logging.getLogger(__name__)
 
@@ -104,34 +105,8 @@ def run_real_backtest(
 
         windows_scanned += 1
 
-        # Run every ICT filter (same pipeline as generate_signal)
-        structure = strategy._detect_market_structure(setup_df)
-        if structure == "neutral":
-            continue
-
-        sweep = strategy._detect_liquidity_sweep(setup_df, structure)
-        if not sweep:
-            continue
-
-        ob = strategy._find_order_block(setup_df, structure)
-        if not ob:
-            continue
-
-        ltp = float(setup_df["close"].iloc[-1])
-        if not _price_in_zone(ltp, ob["low"], ob["high"]):
-            continue
-
-        fvg = strategy._find_fvg(setup_df, structure)
-        if not fvg:
-            continue
-
-        signal = strategy._build_signal(ltp, ob, structure, sweep, "real_bt")
-        if not signal:
-            continue
-
-        risk   = abs(signal.entry - signal.stop_loss)
-        reward = abs(signal.take_profit - signal.entry)
-        if risk <= 0 or (reward / risk) < rr_ratio:
+        signal = _run_strategy_on_window(setup_df, rr_ratio=rr_ratio, strategy=strategy)
+        if signal is None:
             continue
 
         signals_generated += 1

@@ -17,14 +17,4 @@ class TradeSignal(BaseModel):
     reason: str = ""
 
 
-def execute_trade(signal: TradeSignal, executor) -> dict:
-    """
-    Convenience dispatch — delegates to the pre-built executor.
-
-    In practice, instantiate the executor once in ``main.py`` and call
-    ``executor.execute(signal)`` directly so that paper state persists.
-    """
-    return executor.execute(signal)
-
-
-__all__ = ["TradeSignal", "execute_trade"]
+__all__ = ["TradeSignal"]

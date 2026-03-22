@@ -166,24 +166,31 @@ def _simulate_exit(
 _STRAT = ICTStrategy("SIM", ob_lookback=20, kill_zones=[], swing_length=5, rr_ratio=2.0)
 
 
-def _run_strategy_on_window(df: pd.DataFrame, rr_ratio: float = 2.0):
+def _run_strategy_on_window(df: pd.DataFrame, rr_ratio: float = 2.0, strategy=None):
     """
     Run all ICT checks on a single 100-candle window.
     Returns a TradeSignal or None.
+
+    Parameters
+    ----------
+    strategy : ICTStrategy instance to use. Defaults to the internal ``_STRAT``
+               singleton (no kill-zone filter, ob_lookback=20, swing_length=5).
+               Pass a custom instance for real-data backtests with different params.
     """
+    strat = strategy or _STRAT
     df = _prepare(df.copy())
     if len(df) < 20:
         return None
 
-    structure = _STRAT._detect_market_structure(df)
+    structure = strat._detect_market_structure(df)
     if structure == "neutral":
         return None
 
-    sweep = _STRAT._detect_liquidity_sweep(df, structure)
+    sweep = strat._detect_liquidity_sweep(df, structure)
     if not sweep:
         return None
 
-    ob = _STRAT._find_order_block(df, structure)
+    ob = strat._find_order_block(df, structure)
     if not ob:
         return None
 
@@ -191,11 +198,11 @@ def _run_strategy_on_window(df: pd.DataFrame, rr_ratio: float = 2.0):
     if not _price_in_zone(ltp, ob["low"], ob["high"]):
         return None
 
-    fvg = _STRAT._find_fvg(df, structure)
+    fvg = strat._find_fvg(df, structure)
     if not fvg:
         return None
 
-    signal = _STRAT._build_signal(ltp, ob, structure, sweep, "backtest")
+    signal = strat._build_signal(ltp, ob, structure, sweep, "backtest")
     if signal is None:
         return None
 

@@ -10,7 +10,7 @@ def get_broker(name: str) -> BaseBroker:
     Instantiate a broker by name.
 
     Args:
-        name: ``"upstox"`` or ``"delta"``
+        name: ``"upstox"``, ``"delta"``, or ``"mock"``
 
     Returns:
         A fully initialised broker instance.

@@ -96,8 +96,21 @@ class LiveExecutor:
             )
             result["sl_order_id"] = sl_order_id
         except BrokerAPIError as exc:
-            logger.warning("SL order failed (entry still placed): %s", exc)
+            logger.warning(
+                "SL order failed — attempting to cancel entry %s: %s",
+                entry_order_id, exc,
+            )
             result["sl_error"] = str(exc)
+            try:
+                self._broker.cancel_order(entry_order_id)
+                result["status"] = "cancelled"
+                logger.info("Entry order %s cancelled after SL failure", entry_order_id)
+            except BrokerAPIError as cancel_exc:
+                logger.error(
+                    "UNPROTECTED POSITION — entry %s could not be cancelled: %s",
+                    entry_order_id, cancel_exc,
+                )
+                result["cancel_error"] = str(cancel_exc)
 
         trade_logger.info({
             "event": "order_placed",

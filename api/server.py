@@ -167,7 +167,12 @@ async def api_scan(
         rr_ratio     = 2.0,
     )
 
-    signal = strategy.generate_signal(broker)
+    try:
+        signal = strategy.generate_signal(broker)
+    except Exception as exc:
+        logger.error("Signal scan error: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Scan failed: {exc}")
+
     if signal is None:
         _last_signal = None
         return {"signal": None, "message": "No ICT setup found on current data"}
@@ -182,7 +187,11 @@ async def api_scan(
         "timestamp":   datetime.now(timezone.utc).isoformat(),
     }
 
-    exec_result = _executor.execute(signal)
+    try:
+        exec_result = _executor.execute(signal)
+    except Exception as exc:
+        logger.error("Execution error: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Execution failed: {exc}")
 
     # Update equity history
     bal = _executor.get_balance()
@@ -209,13 +218,16 @@ class BacktestParams(BaseModel):
 @app.post("/api/backtest/synthetic")
 async def api_backtest_synthetic(params: BacktestParams):
     global _last_backtest
-    _last_backtest = run_backtest(
-        n_trials  = params.trials,
-        win_rate  = params.win_rate,
-        rr_ratio  = params.rr,
-        risk_pct  = params.risk,
-        seed      = params.seed,
-    )
+    try:
+        _last_backtest = run_backtest(
+            n_trials  = params.trials,
+            win_rate  = params.win_rate,
+            rr_ratio  = params.rr,
+            risk_pct  = params.risk,
+            seed      = params.seed,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
     await _broadcast({"event": "backtest_done", "data": _last_backtest})
     return _last_backtest
 
