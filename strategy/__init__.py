@@ -79,6 +79,7 @@ class ICTStrategy(BaseStrategy):
         ob_lookback: int = 10,
         kill_zones: list[str] | None = None,
         rr_ratio: float = 2.0,
+        use_htf: bool = False,
     ) -> None:
         self.symbol = symbol
         self.interval = interval
@@ -86,6 +87,9 @@ class ICTStrategy(BaseStrategy):
         self.ob_lookback = ob_lookback
         self.kill_zones = kill_zones if kill_zones is not None else ["london_open", "ny_open"]
         self.rr_ratio = rr_ratio
+        self.use_htf = use_htf
+        self._last_df: pd.DataFrame | None = None
+        self._htf_bias: str = "neutral"     # cached HTF bias
 
     # ------------------------------------------------------------------
     # Entry point
@@ -109,6 +113,7 @@ class ICTStrategy(BaseStrategy):
             logger.warning("ICT: insufficient OHLC data for %s", self.symbol)
             return None
         df = _prepare(df)
+        self._last_df = df   # expose for ML feature extraction
 
         # Step 3 — Market structure
         structure = self._detect_market_structure(df)
@@ -116,6 +121,21 @@ class ICTStrategy(BaseStrategy):
             logger.debug("ICT: market structure neutral — skipping")
             return None
         logger.debug("ICT: market structure = %s", structure)
+
+        # Step 3b — Multi-timeframe confirmation (optional)
+        if self.use_htf:
+            try:
+                from strategy.multi_timeframe import get_htf_bias, check_alignment
+                self._htf_bias = get_htf_bias(broker, self.symbol, self.interval)
+                if not check_alignment(structure, self._htf_bias):
+                    logger.debug(
+                        "ICT: HTF bias (%s) disagrees with entry (%s) — skipping",
+                        self._htf_bias, structure,
+                    )
+                    return None
+            except Exception as exc:
+                logger.debug("HTF check failed (continuing): %s", exc)
+                self._htf_bias = "neutral"
 
         # Step 4 — Liquidity sweep
         sweep = self._detect_liquidity_sweep(df, structure)

@@ -10,7 +10,7 @@ def get_broker(name: str) -> BaseBroker:
     Instantiate a broker by name.
 
     Args:
-        name: ``"upstox"``, ``"delta"``, or ``"mock"``
+        name: ``"upstox"`` or ``"delta"``
 
     Returns:
         A fully initialised broker instance.
@@ -23,12 +23,9 @@ def get_broker(name: str) -> BaseBroker:
     elif name == "delta":
         from brokers.delta import DeltaBroker
         return DeltaBroker()
-    elif name == "mock":
-        from brokers.mock import MockBroker
-        return MockBroker()
     else:
         raise ValueError(
-            f"Unknown broker: {name!r}. Supported: 'upstox', 'delta', 'mock'"
+            f"Unknown broker: {name!r}. Supported: 'upstox', 'delta'"
         )
 
 

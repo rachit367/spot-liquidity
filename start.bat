@@ -46,7 +46,7 @@ if not exist ".env" (
 )
 
 :: ── Launch dashboard ──────────────────────────────
-echo  [START] Dashboard starting at http://localhost:8001
+echo  [START] Dashboard starting at http://localhost:8303
 echo  [INFO]  Press Ctrl+C to stop.
 echo.
 start "" "http://localhost:8303"

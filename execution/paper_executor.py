@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 
 from execution import TradeSignal
 from execution.risk_manager import RiskManager
+from execution.trailing_stop import TrailingStopManager
+from execution.correlation_filter import CorrelationFilter
 
 logger = logging.getLogger(__name__)
 trade_logger = logging.getLogger("trades")
@@ -24,6 +26,8 @@ class PaperExecutor:
         initial_balance: float = 100_000.0,
         risk_pct: float = 1.0,
         risk_manager: RiskManager | None = None,
+        use_trailing_stop: bool = True,
+        use_correlation_filter: bool = True,
     ) -> None:
         self._balance = initial_balance
         self._risk_pct = risk_pct
@@ -31,6 +35,8 @@ class PaperExecutor:
         self._positions: list[dict] = []
         self._trade_log: list[dict] = []
         self._order_counter = 0
+        self._trailing = TrailingStopManager() if use_trailing_stop else None
+        self._corr_filter = CorrelationFilter() if use_correlation_filter else None
 
     # ------------------------------------------------------------------
     # Public API
@@ -38,6 +44,15 @@ class PaperExecutor:
 
     def execute(self, signal: TradeSignal) -> dict:
         """Simulate order placement and immediate fill at signal.entry."""
+        # Correlation filter check
+        if self._corr_filter:
+            allowed, reason = self._corr_filter.can_open(
+                signal.symbol, signal.direction, self._positions,
+            )
+            if not allowed:
+                logger.warning("Paper trade BLOCKED: %s", reason)
+                return {"status": "blocked", "reason": reason}
+
         self._risk_mgr.check_trade_allowed(self._balance)
 
         qty = self._risk_mgr.compute_quantity(
@@ -63,6 +78,16 @@ class PaperExecutor:
             "reason": signal.reason,
         }
         self._positions.append(position)
+
+        # Register with trailing stop manager
+        if self._trailing:
+            self._trailing.register(
+                order_id=order_id,
+                entry=signal.entry,
+                stop_loss=signal.stop_loss,
+                take_profit=signal.take_profit,
+                direction=signal.direction,
+            )
 
         result = {
             "status": "filled",
@@ -109,13 +134,18 @@ class PaperExecutor:
                 still_open.append(pos)
                 continue
 
+            # Update trailing stop if enabled
+            active_sl = pos["stop_loss"]
+            if self._trailing:
+                active_sl = self._trailing.update(pos["order_id"], price)
+
             hit_tp = hit_sl = False
             if pos["direction"] == "long":
                 hit_tp = price >= pos["take_profit"]
-                hit_sl = price <= pos["stop_loss"]
+                hit_sl = price <= active_sl
             else:
                 hit_tp = price <= pos["take_profit"]
-                hit_sl = price >= pos["stop_loss"]
+                hit_sl = price >= active_sl
 
             if hit_tp or hit_sl:
                 exit_price = pos["take_profit"] if hit_tp else pos["stop_loss"]
@@ -134,6 +164,10 @@ class PaperExecutor:
                 }
                 self._trade_log.append(record)
                 closed.append(record)
+
+                # Remove from trailing stop manager
+                if self._trailing:
+                    self._trailing.remove(pos["order_id"])
 
                 trade_logger.info({
                     "event": "position_closed",

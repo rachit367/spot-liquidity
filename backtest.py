@@ -1,15 +1,17 @@
 """
 ICT Strategy — Backtest CLI
 
-Supports both synthetic (fast, parameterised) and real-data (live API) modes.
+Modes:
+    Synthetic  — fast, no API keys needed (default when no --broker given)
+    Real data  — walks real historical OHLC from Delta or Upstox
 
 Usage:
-    # Synthetic — fast, no API keys needed
+    # Synthetic
     python backtest.py
     python backtest.py --trials 1000 --win-rate 0.55
     python backtest.py --scenarios
 
-    # Real data — Delta Exchange (public historical candles, no auth)
+    # Real data — Delta Exchange (public historical candles, no auth needed)
     python backtest.py --broker delta --symbol BTCUSDT --interval 4h
     python backtest.py --broker delta --symbol BTCUSDT --interval 1h --step 5
 
@@ -77,10 +79,11 @@ def main() -> None:
         epilog=__doc__,
     )
 
-    # Mode selection
-    p.add_argument("--broker",   default="mock",
-                   choices=["mock", "delta", "upstox"],
-                   help="'mock' = synthetic; 'delta'/'upstox' = real historical data")
+    # Broker (optional — omit for synthetic mode)
+    p.add_argument("--broker",
+                   choices=["delta", "upstox"],
+                   default=None,
+                   help="Real-data broker. Omit to run synthetic backtest.")
     p.add_argument("--symbol",   default="",
                    help="Instrument symbol for real-data mode "
                         "(e.g. BTCUSDT for Delta, 'NSE_INDEX|Nifty 50' for Upstox)")
@@ -92,7 +95,7 @@ def main() -> None:
     p.add_argument("--trials",    type=int,   default=500,
                    help="[synthetic] Number of test cases (default: 500)")
     p.add_argument("--win-rate",  type=float, default=0.58,
-                   help="[synthetic] Fraction reaching TP (default: 0.58)")
+                   help="[synthetic] Fraction of trials reaching TP, 0–1 (default: 0.58)")
     p.add_argument("--scenarios", action="store_true",
                    help="[synthetic] Print sensitivity table across win rates")
 
@@ -108,8 +111,8 @@ def main() -> None:
 
     args = p.parse_args()
 
-    # ── Synthetic mode ─────────────────────────────────────────────────────
-    if args.broker == "mock":
+    # ── Synthetic mode (no broker given) ───────────────────────────────────
+    if args.broker is None:
         if args.scenarios:
             _sensitivity_table(base_trials=300, rr=args.rr, risk=args.risk)
             return
@@ -159,7 +162,6 @@ def main() -> None:
         print(f"  Interval: {m.get('interval', '—')}")
         sys.exit(1)
 
-    # Extra real-data info before standard report
     print(f"  Candles fetched    : {m.get('candles_fetched', '—')}")
     print(f"  Run at (UTC)       : {m.get('run_at', '—')}")
     print_report(m)

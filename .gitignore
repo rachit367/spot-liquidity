@@ -17,6 +17,11 @@ __pycache__/
 # Logs (auto-generated)
 logs/*.log
 logs/*.jsonl
+logs/trades_ml.csv
+
+# ML models
+models/*/bundle.pkl
+models/latest
 
 # Build / packaging
 build/

@@ -18,18 +18,19 @@
     ICT Trading Bot
   </div>
 
-  <span class="badge badge-paper" id="mode-badge">PAPER</span>
+  <button class="mode-btn badge badge-paper" id="mode-btn" title="Click to toggle Paper / Live mode">PAPER</button>
 
   <select id="broker-select">
-    <option value="mock">Mock (synthetic)</option>
     <option value="delta">Delta Exchange</option>
     <option value="upstox">Upstox</option>
   </select>
 
+  <input type="text" class="symbol-input" id="symbol-input" placeholder="Symbol" value="BTCUSD" title="Instrument symbol for scan" />
+
   <div class="topbar-spacer"></div>
 
   <div class="spinner" id="scan-spin"></div>
-  <button class="btn btn-success" id="scan-btn">▶ Scan Signal</button>
+  <button class="btn btn-success" id="scan-btn">&#9654; Scan Signal</button>
 </header>
 
 <!-- ── Toast container ───────────────────────────────────────────────── -->
@@ -44,7 +45,7 @@
     <div class="stat-card">
       <div class="stat-label">Balance</div>
       <div class="stat-value text-blue" id="stat-balance">—</div>
-      <div class="stat-sub">Paper trading account</div>
+      <div class="stat-sub" id="stat-balance-sub">Paper trading account</div>
     </div>
 
     <div class="stat-card">
@@ -119,11 +120,205 @@
       <!-- ICT checklist -->
       <div class="checklist" id="checklist"></div>
 
+      <!-- ML confidence bar -->
+      <div class="ml-confidence-row" id="ml-confidence-row" style="display:none">
+        <div class="ml-confidence-header">
+          <span class="ml-confidence-label">AI Confidence</span>
+          <span class="ml-confidence-verdict" id="ml-confidence-verdict"></span>
+        </div>
+        <div class="ml-confidence-bar-wrap">
+          <div class="ml-confidence-bar" id="ml-confidence-bar"></div>
+        </div>
+        <div class="ml-confidence-pct" id="ml-confidence-pct">—</div>
+      </div>
+
       <!-- Reason text -->
       <div class="signal-reason" id="signal-reason">No active setup.</div>
     </div>
 
   </div><!-- /mid-row -->
+
+
+  <!-- ── AI Intelligence row ─────────────────────────────────────────── -->
+  <div class="ml-row">
+
+    <!-- ML Status card -->
+    <div class="card">
+      <div class="card-header">
+        <span>AI Signal Intelligence</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="spinner" id="ml-spin"></div>
+          <button class="btn btn-primary" id="ml-train-btn">&#8635; Train Model</button>
+        </div>
+      </div>
+      <div class="ml-status-grid">
+        <div class="ml-metric">
+          <div class="ml-metric-label">Model</div>
+          <div class="ml-metric-val" id="ml-model-name">—</div>
+        </div>
+        <div class="ml-metric">
+          <div class="ml-metric-label">Version</div>
+          <div class="ml-metric-val text-blue" id="ml-version">—</div>
+        </div>
+        <div class="ml-metric">
+          <div class="ml-metric-label">F1 Score</div>
+          <div class="ml-metric-val" id="ml-f1">—</div>
+        </div>
+        <div class="ml-metric">
+          <div class="ml-metric-label">ROC-AUC</div>
+          <div class="ml-metric-val" id="ml-auc">—</div>
+        </div>
+        <div class="ml-metric">
+          <div class="ml-metric-label">Trained On</div>
+          <div class="ml-metric-val" id="ml-ntrain">—</div>
+        </div>
+        <div class="ml-metric">
+          <div class="ml-metric-label">Live Accuracy</div>
+          <div class="ml-metric-val" id="ml-live-acc">—</div>
+        </div>
+      </div>
+      <div class="ml-threshold-row">
+        <label class="field-label" for="ml-threshold-input">Confidence Threshold</label>
+        <input type="range" id="ml-threshold-input" min="50" max="90" value="60" step="1" class="ml-slider" />
+        <span class="ml-threshold-val" id="ml-threshold-val">0.60</span>
+        <button class="btn btn-ghost" id="ml-threshold-set">Set</button>
+      </div>
+      <div class="ml-status-line" id="ml-status-line">Loading model status…</div>
+    </div>
+
+    <!-- ML Feature Importances -->
+    <div class="card">
+      <div class="card-header">
+        <span>Top Feature Importances</span>
+        <span class="section-title" style="font-size:11px;color:var(--muted)">What drives each decision</span>
+      </div>
+      <div id="ml-features-list" class="ml-features-list">
+        <div class="empty-state">Train a model to see features</div>
+      </div>
+    </div>
+
+  </div><!-- /ml-row -->
+
+
+  <!-- ── Training Panel ──────────────────────────────────────────────── -->
+  <div class="training-row">
+
+    <!-- Training Controls -->
+    <div class="card">
+      <div class="card-header">
+        <span>🧠 Continuous Training</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="spinner" id="train-loop-spin"></div>
+          <button class="btn btn-success" id="train-start-btn">▶ Start Training</button>
+          <button class="btn btn-danger" id="train-stop-btn" disabled>■ Stop</button>
+        </div>
+      </div>
+
+      <!-- Training config controls -->
+      <div class="training-controls">
+        <div class="field-group">
+          <label class="field-label">Duration</label>
+          <select class="field-input" id="train-duration">
+            <option value="0.5">30 min</option>
+            <option value="1">1 hour</option>
+            <option value="2" selected>2 hours</option>
+            <option value="4">4 hours</option>
+            <option value="8">8 hours</option>
+            <option value="24">24 hours</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Symbol</label>
+          <input class="field-input" id="train-symbol" type="text" value="BTCUSD" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Interval</label>
+          <select class="field-input" id="train-interval">
+            <option value="5m">5m</option>
+            <option value="15m" selected>15m</option>
+            <option value="30m">30m</option>
+            <option value="1h">1h</option>
+            <option value="4h">4h</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Fetch Every</label>
+          <select class="field-input" id="train-fetch-sec">
+            <option value="60">1 min</option>
+            <option value="120">2 min</option>
+            <option value="300" selected>5 min</option>
+            <option value="600">10 min</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Retrain Every</label>
+          <input class="field-input" id="train-retrain-every" type="number" value="50" min="5" max="500" step="5" />
+          <span class="field-hint">trades</span>
+        </div>
+      </div>
+
+      <!-- Progress section -->
+      <div class="training-progress" id="training-progress">
+        <div class="training-progress-bar-wrap">
+          <div class="training-progress-bar" id="training-progress-bar" style="width:0%"></div>
+        </div>
+        <div class="training-stats-grid">
+          <div class="train-stat">
+            <div class="train-stat-label">Status</div>
+            <div class="train-stat-val" id="train-status-val">Idle</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Epoch</div>
+            <div class="train-stat-val text-blue" id="train-epoch">0</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Windows Scanned</div>
+            <div class="train-stat-val" id="train-windows">0</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Signals</div>
+            <div class="train-stat-val" id="train-signals">0</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Trades</div>
+            <div class="train-stat-val text-blue" id="train-trades">0</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Win Rate</div>
+            <div class="train-stat-val" id="train-winrate">—</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Retrains</div>
+            <div class="train-stat-val text-purple" id="train-retrains">0</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Model F1</div>
+            <div class="train-stat-val" id="train-f1">—</div>
+          </div>
+          <div class="train-stat">
+            <div class="train-stat-label">Elapsed</div>
+            <div class="train-stat-val" id="train-elapsed">—</div>
+          </div>
+        </div>
+        <div class="training-error" id="train-error" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Mistake Analysis -->
+    <div class="card">
+      <div class="card-header">
+        <span>📊 Mistake Analysis</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="spinner" id="mistake-spin"></div>
+          <button class="btn btn-ghost" id="mistake-refresh-btn">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="mistake-content" id="mistake-content">
+        <div class="empty-state">Train the bot to see mistake analysis insights</div>
+      </div>
+    </div>
+
+  </div><!-- /training-row -->
 
 
   <!-- ── Bottom row: backtest + trade log ────────────────────────────── -->
@@ -135,7 +330,7 @@
         <span>Backtest Engine</span>
         <div style="display:flex;gap:8px;align-items:center">
           <div class="spinner" id="bt-spin"></div>
-          <button class="btn btn-primary" id="bt-run-btn">▶ Run</button>
+          <button class="btn btn-primary" id="bt-run-btn">&#9654; Run</button>
         </div>
       </div>
 
@@ -172,7 +367,6 @@
           <select class="field-input" id="bt-real-broker">
             <option value="delta">Delta Exchange</option>
             <option value="upstox">Upstox</option>
-            <option value="mock">Mock</option>
           </select>
         </div>
         <div class="field-group">
@@ -192,7 +386,7 @@
 
       <!-- Status line -->
       <div class="bt-run-row">
-        <span class="bt-status" id="bt-status">Click ▶ Run to start a backtest.</span>
+        <span class="bt-status" id="bt-status">Click &#9654; Run to start a backtest.</span>
       </div>
 
       <!-- Results grid -->

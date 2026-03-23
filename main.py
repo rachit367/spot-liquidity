@@ -37,9 +37,9 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--broker",
-        choices=["upstox", "delta", "mock"],
+        choices=["upstox", "delta"],
         default=settings.default_broker,
-        help="Broker to use (default: from .env). Use 'mock' for local testing.",
+        help="Broker to use (default: from .env)",
     )
     return p.parse_args()
 
@@ -95,7 +95,7 @@ def main() -> None:
         interval="15m",
         swing_length=5,
         ob_lookback=20,
-        # Indian market (NSE/BSE) and mock testing: no kill zone filter
+        # Indian market (NSE/BSE): no kill zone filter needed
         # Delta (crypto): only trade during London + NY sessions
         kill_zones=["london_open", "ny_open"] if broker_name == "delta" else [],
         rr_ratio=2.0,

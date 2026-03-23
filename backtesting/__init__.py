@@ -36,7 +36,6 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 
-from brokers.mock import _build_ict_candles
 from execution.risk_manager import RiskManager
 from strategy import ICTStrategy, _prepare, _price_in_zone
 
@@ -101,6 +100,128 @@ def _make_forward_candles(
             10_000,
         ))
         price = c
+
+    return candles
+
+
+def _build_ict_candles(
+    base_price: float,
+    trend: str,
+    volatility: float,
+    count: int,
+) -> list[tuple]:
+    """
+    Build ``count`` candles with a guaranteed ICT setup embedded.
+
+    Price roadmap (bullish, base_price=22500):
+      idx  0-9   flat baseline ~22500
+      idx 10-24  impulse 1 up  → SH1
+      idx 25-34  retrace 1 down → SL1 (HL)
+      idx 35-54  impulse 2 up  → SH2 (HH)
+      idx 55-79  retrace 2 down → SL2  ← reference zone for sweep check
+      idx 80     sweep candle: wick < SL2, close > SL2
+      idx 81     OB bearish candle
+      idx 82-83  OB impulse (FVG candle 1 & 2)
+      idx 84     FVG candle 3: low > candle[82].high
+      idx 85-99  settle inside OB zone
+    """
+    np.random.seed(42)
+    now = datetime.now().replace(second=0, microsecond=0)
+    s   = 1 if trend == "bullish" else -1
+    bp  = base_price
+    v   = volatility
+
+    if trend == "bullish":
+        sh1   = bp * 1.022
+        sl1   = bp * 1.009
+        sh2   = bp * 1.044
+        sl2   = sh2 * 0.990
+        ob_h  = sl2 * 1.003
+        ob_l  = sl2 * 0.992
+        fvg_push = bp * 0.003
+    else:
+        sl1   = bp * 0.978
+        sh1   = bp * 0.991
+        sl2   = sh1 * 1.010
+        ob_l  = sl2 * 0.997
+        ob_h  = sl2 * 1.008
+        sh2   = sl2 * 1.001
+        fvg_push = -bp * 0.003
+
+    settle     = sl2 * 1.0004
+    sweep_wick = sl2 * 0.993
+
+    def lerp(a: float, b: float, t: float) -> float:
+        return a + (b - a) * t
+
+    def tiny() -> float:
+        return bp * v * np.random.randn() * 0.05
+
+    def make(idx: int, o: float, c: float, wt: float = 0.0, wb: float = 0.0) -> tuple:
+        ts  = now - timedelta(minutes=30 * (count - idx))
+        h   = max(o, c) + abs(wt)
+        l   = min(o, c) - abs(wb)
+        vol = int(abs(np.random.normal(12000, 2000)))
+        return (ts.isoformat(), round(o, 2), round(h, 2), round(l, 2), round(c, 2), vol)
+
+    w = bp * v * 0.4
+
+    milestones = [
+        (0,  9,  bp,  bp),
+        (10, 24, bp,  sh1),
+        (25, 34, sh1, sl1),
+        (35, 54, sl1, sh2),
+        (55, 79, sh2, sl2),
+    ]
+    targets: list[float] = [sl2] * count
+    for seg_start, seg_end, p_start, p_end in milestones:
+        n = seg_end - seg_start + 1
+        for k in range(n):
+            t = k / (n - 1) if n > 1 else 0.0
+            targets[seg_start + k] = lerp(p_start, p_end, t)
+
+    candles: list[tuple] = []
+    prev_close = bp
+
+    for i in range(count):
+        if i <= 79:
+            o = prev_close
+            c = targets[i] + tiny()
+            candles.append(make(i, o, c, w * 0.4, w * 0.4))
+        elif i == 80:
+            o = prev_close
+            c = settle
+            if s == 1:
+                wb = abs(o - sweep_wick) + w * 0.2
+                wt = w * 0.1
+            else:
+                wt = abs(sweep_wick - o) + w * 0.2
+                wb = w * 0.1
+            candles.append(make(i, o, c, wt, wb))
+        elif i == 81:
+            o = prev_close
+            c = ob_l
+            candles.append(make(i, o, c, w * 0.1, w * 0.1))
+        elif i == 82:
+            o = prev_close
+            c = lerp(ob_l, ob_h, 0.45) + tiny() * 0.1
+            candles.append(make(i, o, c, w * 0.05, w * 0.3))
+        elif i == 83:
+            o = prev_close
+            c = ob_h
+            candles.append(make(i, o, c, w * 0.05, w * 0.05))
+        elif i == 84:
+            c82_high = candles[82][2]
+            o = max(prev_close, c82_high + 2.0)
+            c = settle + tiny() * 0.1
+            candles.append(make(i, o, c, w * 0.2, 0.0))
+        else:
+            o = prev_close
+            c = settle + tiny() * 0.3
+            c = max(ob_l * 1.0001, min(ob_h * 0.9999, c))
+            candles.append(make(i, o, c, w * 0.15, w * 0.15))
+
+        prev_close = candles[-1][4]
 
     return candles
 
@@ -240,7 +361,7 @@ def run_backtest(
                       0.58 → 58 % of trades expected to win.
     rr_ratio        : Minimum reward-to-risk ratio enforced by the strategy.
     risk_pct        : Equity percentage risked per trade.
-    volatility      : Candle noise as fraction of price (same as MockBroker).
+    volatility      : Candle noise as fraction of price (default 0.2 %).
     initial_balance : Starting equity.
     seed            : Master seed for full reproducibility.
     """

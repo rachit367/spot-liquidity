@@ -14,7 +14,6 @@ from __future__ import annotations
 import json
 import logging
 import logging.handlers
-import os
 from pathlib import Path
 from typing import Literal
 
@@ -66,6 +65,14 @@ class Settings(BaseSettings):
     delta_api_key: str = ""
     delta_api_secret: str = ""
     delta_base_url: str = "https://api.india.delta.exchange"
+
+    # Training loop
+    training_duration_hours: float = Field(default=2.0, ge=0.1, le=48.0)
+    training_fetch_interval_sec: int = Field(default=300, ge=10, le=3600)
+    training_retrain_every: int = Field(default=50, ge=5, le=500)
+    training_symbol: str = "BTCUSD"
+    training_interval: str = "15m"
+    training_fetch_count: int = Field(default=500, ge=100, le=2000)
 
 
 # ---------------------------------------------------------------------------
