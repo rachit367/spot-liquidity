@@ -241,7 +241,10 @@ def synthetic_dataset(n: int = 1000, seed: int = 42) -> dict:
     from those simulated outcomes.  Features are randomly sampled around
     the distributions expected in real ICT setups.
     """
-    from backtesting import _build_ict_candles, _run_strategy_on_window, _simulate_exit
+    from backtesting import (
+        _build_ict_candles, _run_strategy_on_window,
+        _simulate_exit, _make_forward_candles,
+    )
     from ml.feature_engineering import extract
     import random
 
@@ -251,7 +254,7 @@ def synthetic_dataset(n: int = 1000, seed: int = 42) -> dict:
     X_list, y_list = [], []
 
     # Build synthetic candle windows and extract features
-    for _ in range(n):
+    for i in range(n):
         base_price  = rng.uniform(10_000, 70_000)
         trend       = rng.choice(["bullish", "bearish"])
         volatility  = rng.uniform(0.005, 0.025)
@@ -260,18 +263,32 @@ def synthetic_dataset(n: int = 1000, seed: int = 42) -> dict:
         if raw_candles is None or len(raw_candles) < 20:
             continue
 
-        df_candles = pd.DataFrame(raw_candles, columns=["open", "high", "low", "close"])
+        df_candles = pd.DataFrame(raw_candles, columns=["timestamp", "open", "high", "low", "close", "volume"])
         signal = _run_strategy_on_window(df_candles, rr_ratio=2.0)
         if signal is None:
             continue
 
-        outcome = _simulate_exit(signal, df_candles, rr_ratio=2.0)
-        if outcome is None:
+        # Generate separate forward candles for exit simulation.
+        # ~50 % drift toward TP, ~50 % toward SL so both classes appear.
+        win = rng.random() < 0.55
+        going_up = (win and signal.direction == "long") or \
+                   (not win and signal.direction == "short")
+        last_close = float(df_candles["close"].iloc[-1])
+        fwd_raw = _make_forward_candles(
+            last_close, volatility, 50,
+            seed=(seed + i) % 2**31,
+            going_up=going_up,
+        )
+        df_fwd = pd.DataFrame(fwd_raw, columns=["timestamp", "open", "high", "low", "close", "volume"])
+
+        exit_result = _simulate_exit(signal, df_fwd)
+        if exit_result is None:
             continue
+        _exit_price, outcome_str = exit_result
 
         vec = extract(df_candles, signal)
         X_list.append(vec)
-        y_list.append(1 if outcome["result"] == "win" else 0)
+        y_list.append(1 if outcome_str == "tp" else 0)
 
     if len(X_list) < 20:
         logger.warning("Synthetic dataset produced only %d samples", len(X_list))

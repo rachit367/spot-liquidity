@@ -573,6 +573,12 @@ function connectWS() {
       toast('Training complete! Model has been updated.', 'success');
       setTrainingUI(false);
       refreshMLStatus();
+    } else if (msg.event === 'autoscan_tick') {
+      updateAutoscanUI(msg.data);
+      if (msg.data.signal) {
+        renderSignal(msg.data.signal);
+        if (msg.data.ml) renderMLConfidence(msg.data.ml);
+      }
     }
   };
 
@@ -640,11 +646,13 @@ function renderTrainingProgress(s) {
 }
 
 async function startTraining() {
-  const duration = el('train-duration').value;
-  const symbol   = el('train-symbol').value;
-  const interval = el('train-interval').value;
-  const fetchSec = el('train-fetch-sec').value;
-  const retrain  = el('train-retrain-every').value;
+  const duration     = el('train-duration').value;
+  const symbol       = el('train-symbol').value;
+  const interval     = el('train-interval').value;
+  const deepHistory  = el('train-deep-history').value;
+  const fetchCount   = el('train-fetch-count').value;
+  const fetchSec     = el('train-fetch-sec').value;
+  const retrain      = el('train-retrain-every').value;
 
   el('train-start-btn').disabled = true;
   el('train-loop-spin').classList.add('show');
@@ -654,12 +662,17 @@ async function startTraining() {
       duration_hours: duration,
       symbol: symbol,
       interval: interval,
+      fetch_count: fetchCount,
       fetch_interval_sec: fetchSec,
       retrain_every: retrain,
       broker_name: 'delta',
+      deep_history_candles: deepHistory,
     });
     const data = await apiFetch(`/api/training/start?${params}`, { method: 'POST' });
-    toast(`Training started (${duration}h, ${symbol}, ${interval})`, 'success');
+    const deepLabel = parseInt(deepHistory) > 0
+      ? ` | Deep history: ${(parseInt(deepHistory)/1000).toFixed(0)}K candles on first epoch`
+      : '';
+    toast(`Training started (${duration}h, ${symbol}, ${interval})${deepLabel}`, 'success');
     setTrainingUI(true);
     if (data.status) renderTrainingProgress(data.status);
     // Start polling training status
@@ -780,6 +793,59 @@ async function loadMistakeReport() {
   }
 }
 
+// ── Auto-scan controls ────────────────────────────────────────────────────
+function updateAutoscanUI(s) {
+  const indicator = el('autoscan-indicator');
+  const startBtn  = el('autoscan-start-btn');
+  const stopBtn   = el('autoscan-stop-btn');
+
+  if (s && s.running) {
+    indicator.style.display = '';
+    startBtn.disabled = true;
+    stopBtn.disabled  = false;
+    const stats = `${s.scans} scans · ${s.signals_found} signals · ${s.trades_executed} trades`;
+    el('autoscan-stats').textContent = stats;
+  } else {
+    indicator.style.display = 'none';
+    startBtn.disabled = false;
+    stopBtn.disabled  = true;
+  }
+}
+
+async function startAutoscan() {
+  const interval = el('autoscan-interval').value;
+  const broker   = el('broker-select').value;
+  const symbol   = (el('symbol-input').value || '').trim();
+
+  try {
+    const params = new URLSearchParams({ interval_sec: interval });
+    if (broker) params.set('broker_name', broker);
+    if (symbol) params.set('symbol', symbol);
+    await apiFetch(`/api/autoscan/start?${params}`, { method: 'POST' });
+    toast(`Auto-scan started (every ${interval}s on ${symbol || 'default'})`, 'success');
+    updateAutoscanUI({ running: true, scans: 0, signals_found: 0, trades_executed: 0 });
+  } catch (e) {
+    toast('Auto-scan start failed: ' + e.message, 'error');
+  }
+}
+
+async function stopAutoscan() {
+  try {
+    await apiFetch('/api/autoscan/stop', { method: 'POST' });
+    toast('Auto-scan stopped', 'info');
+    updateAutoscanUI({ running: false });
+  } catch (e) {
+    toast('Stop failed: ' + e.message, 'error');
+  }
+}
+
+async function checkAutoscanStatus() {
+  try {
+    const s = await apiFetch('/api/autoscan/status');
+    updateAutoscanUI(s);
+  } catch (_) {}
+}
+
 // ── DOM helpers ───────────────────────────────────────────────────────────
 function el(id) { return document.getElementById(id); }
 
@@ -833,6 +899,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Training loop controls
   el('train-start-btn').addEventListener('click', startTraining);
   el('train-stop-btn').addEventListener('click', stopTraining);
+
+  // Auto-scan controls
+  el('autoscan-start-btn').addEventListener('click', startAutoscan);
+  el('autoscan-stop-btn').addEventListener('click', stopAutoscan);
   el('mistake-refresh-btn').addEventListener('click', loadMistakeReport);
 
   // Initial render placeholders
@@ -848,6 +918,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Check if training is already running
   pollTrainingStatus();
+
+  // Check if auto-scan is already running
+  checkAutoscanStatus();
 
   // Load mistake analysis
   loadMistakeReport();

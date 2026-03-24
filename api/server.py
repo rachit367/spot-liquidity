@@ -494,13 +494,14 @@ async def _training_progress_broadcaster(status: dict) -> None:
 
 @app.post("/api/training/start")
 async def api_training_start(
-    duration_hours:     float = Query(default=settings.training_duration_hours),
-    symbol:             str   = Query(default=settings.training_symbol),
-    interval:           str   = Query(default=settings.training_interval),
-    fetch_count:        int   = Query(default=settings.training_fetch_count),
-    fetch_interval_sec: int   = Query(default=settings.training_fetch_interval_sec),
-    retrain_every:      int   = Query(default=settings.training_retrain_every),
-    broker_name:        str   = Query(default="delta"),
+    duration_hours:       float = Query(default=settings.training_duration_hours),
+    symbol:               str   = Query(default=settings.training_symbol),
+    interval:             str   = Query(default=settings.training_interval),
+    fetch_count:          int   = Query(default=settings.training_fetch_count),
+    fetch_interval_sec:   int   = Query(default=settings.training_fetch_interval_sec),
+    retrain_every:        int   = Query(default=settings.training_retrain_every),
+    broker_name:          str   = Query(default="delta"),
+    deep_history_candles: int   = Query(default=50_000),
 ):
     """Start the continuous training loop (fetches OHLCV and retrains)."""
     from ml.training_loop import get_training_loop
@@ -535,6 +536,7 @@ async def api_training_start(
         fetch_interval_sec=fetch_interval_sec,
         retrain_every=retrain_every,
         broker_name=broker_name,
+        deep_history_candles=deep_history_candles,
     )
 
     if "error" in result:
@@ -629,6 +631,251 @@ async def api_correlation_exposure():
         "open_positions": len(positions),
         "groups": list(cf.groups.keys()),
     }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Auto-scan loop — background signal scanner
+# ─────────────────────────────────────────────────────────────────────────────
+
+_autoscan_task: asyncio.Task | None = None
+_autoscan_state: dict = {
+    "running": False,
+    "interval_sec": 60,
+    "started_at": "",
+    "scans": 0,
+    "signals_found": 0,
+    "trades_executed": 0,
+    "last_scan_at": "",
+    "last_error": "",
+}
+
+
+async def _autoscan_loop(interval_sec: int, broker_name: str, symbol: str) -> None:
+    """Background loop that periodically scans for ICT signals and auto-executes."""
+    global _last_signal, _autoscan_state
+    s = _autoscan_state
+    s["running"] = True
+    s["interval_sec"] = interval_sec
+    s["started_at"] = datetime.now(timezone.utc).isoformat()
+    s["scans"] = 0
+    s["signals_found"] = 0
+    s["trades_executed"] = 0
+    s["last_error"] = ""
+
+    logger.info("Auto-scan started: %s/%s every %ds", broker_name, symbol, interval_sec)
+
+    try:
+        broker = get_broker(broker_name)
+    except Exception as exc:
+        s["last_error"] = f"Broker init failed: {exc}"
+        s["running"] = False
+        return
+
+    strategy = ICTStrategy(
+        symbol=symbol,
+        interval="15m",
+        swing_length=5,
+        ob_lookback=20,
+        kill_zones=["london_open", "ny_open"] if broker_name == "delta" else [],
+        rr_ratio=2.0,
+    )
+
+    while s["running"]:
+        s["scans"] += 1
+        s["last_scan_at"] = datetime.now(timezone.utc).isoformat()
+
+        try:
+            # ── Check daily loss limit ───────────────────────────────────
+            bal = (_paper_executor.get_balance()
+                   if _trading_mode == "paper"
+                   else broker.get_balance())
+            if not _risk_mgr.can_trade(bal):
+                logger.info("Auto-scan: daily loss limit reached — pausing")
+                await _broadcast({"event": "autoscan_tick", "data": {
+                    **s, "message": "Daily loss limit reached — pausing",
+                }})
+                await asyncio.sleep(interval_sec)
+                continue
+
+            # ── Check for duplicate position on same symbol ──────────────
+            if _trading_mode == "paper":
+                open_pos = _paper_executor.get_positions()
+                if any(p.get("symbol") == symbol for p in open_pos):
+                    await _broadcast({"event": "autoscan_tick", "data": {
+                        **s, "message": f"Position already open on {symbol}",
+                    }})
+                    await asyncio.sleep(interval_sec)
+                    continue
+
+            # ── Run ICT strategy ─────────────────────────────────────────
+            signal = strategy.generate_signal(broker)
+
+            if signal is None:
+                await _broadcast({"event": "autoscan_tick", "data": {
+                    **s, "message": "No setup found",
+                }})
+                await asyncio.sleep(interval_sec)
+                continue
+
+            s["signals_found"] += 1
+
+            # ── ML scoring ───────────────────────────────────────────────
+            ml_decision = None
+            try:
+                df_for_ml = getattr(strategy, "_last_df", None)
+                if df_for_ml is not None:
+                    ml_decision = ml.score(df_for_ml, signal)
+            except Exception as exc:
+                logger.warning("Auto-scan ML scoring failed: %s", exc)
+
+            ml_info = None
+            if ml_decision is not None:
+                ml_info = {
+                    "approved":     ml_decision.approved,
+                    "confidence":   round(ml_decision.confidence, 4),
+                    "threshold":    round(ml_decision.threshold, 2),
+                    "suggested_rr": ml_decision.suggested_rr,
+                    "model":        ml_decision.model_name,
+                    "top_features": ml_decision.top_features,
+                }
+
+            # In live mode: block trades the ML rejects
+            if _trading_mode == "live" and ml_decision is not None and not ml_decision.approved:
+                logger.info(
+                    "Auto-scan: ML blocked trade (%.2f < %.2f)",
+                    ml_decision.confidence, ml_decision.threshold,
+                )
+                await _broadcast({"event": "autoscan_tick", "data": {
+                    **s,
+                    "message": f"Signal found but ML blocked ({ml_decision.confidence:.0%} < {ml_decision.threshold:.0%})",
+                    "signal": {"direction": signal.direction, "entry": signal.entry},
+                    "ml": ml_info,
+                }})
+                await asyncio.sleep(interval_sec)
+                continue
+
+            # ── Execute trade ────────────────────────────────────────────
+            _last_signal = {
+                "symbol":      signal.symbol,
+                "direction":   signal.direction,
+                "entry":       signal.entry,
+                "stop_loss":   signal.stop_loss,
+                "take_profit": signal.take_profit,
+                "reason":      signal.reason,
+                "timestamp":   datetime.now(timezone.utc).isoformat(),
+                "ml":          ml_info,
+                "auto":        True,
+            }
+
+            try:
+                exec_result = None
+                if _trading_mode == "live":
+                    executor = LiveExecutor(
+                        broker=broker,
+                        risk_pct=settings.risk_per_trade_pct,
+                        risk_manager=_risk_mgr,
+                    )
+                    exec_result = executor.execute(signal)
+                    try:
+                        new_bal = broker.get_balance()
+                    except Exception:
+                        new_bal = _equity_history[-1]["v"] if _equity_history else 0.0
+                else:
+                    exec_result = _paper_executor.execute(signal)
+                    new_bal = _paper_executor.get_balance()
+
+                s["trades_executed"] += 1
+                _equity_history.append({
+                    "t": datetime.now(timezone.utc).isoformat(),
+                    "v": new_bal,
+                })
+
+                await _broadcast({"event": "signal",  "data": _last_signal})
+                await _broadcast({"event": "balance", "data": {"balance": new_bal, "mode": _trading_mode}})
+
+                logger.info(
+                    "Auto-scan: %s %s @ %.2f  [scan #%d]",
+                    signal.direction.upper(), signal.symbol, signal.entry, s["scans"],
+                )
+            except Exception as exc:
+                logger.error("Auto-scan execution error: %s", exc)
+                s["last_error"] = str(exc)
+
+            # Register for ML outcome tracking
+            try:
+                if ml_decision is not None and isinstance(exec_result, dict):
+                    trade_id = exec_result.get("order_id") or exec_result.get("trade_id") or f"auto_{datetime.now(timezone.utc).timestamp()}"
+                    ml.register_pending(
+                        trade_id=str(trade_id),
+                        signal=signal,
+                        features=ml_decision.feature_vec,
+                        confidence=ml_decision.confidence,
+                        prediction=1 if ml_decision.confidence >= ml_decision.threshold else 0,
+                        timestamp=datetime.now(timezone.utc),
+                    )
+            except Exception:
+                pass
+
+            await _broadcast({"event": "autoscan_tick", "data": {
+                **s,
+                "message": f"Trade executed: {signal.direction.upper()} @ {signal.entry}",
+                "signal": _last_signal,
+                "ml": ml_info,
+            }})
+
+        except Exception as exc:
+            logger.error("Auto-scan error: %s", exc)
+            s["last_error"] = str(exc)
+            await _broadcast({"event": "autoscan_tick", "data": {
+                **s, "message": f"Error: {exc}",
+            }})
+
+        await asyncio.sleep(interval_sec)
+
+    s["running"] = False
+    logger.info("Auto-scan stopped after %d scans", s["scans"])
+
+
+@app.post("/api/autoscan/start")
+async def api_autoscan_start(
+    interval_sec: int = Query(default=60, ge=30, le=300),
+    broker_name:  str = Query(default=""),
+    symbol:       str = Query(default=""),
+):
+    """Start automatic signal scanning on a timer."""
+    global _autoscan_task
+    if _autoscan_state["running"]:
+        raise HTTPException(status_code=409, detail="Auto-scan is already running")
+
+    if not broker_name:
+        broker_name = _active_broker_name
+    if not symbol:
+        symbol = _default_symbol(broker_name)
+
+    _autoscan_task = asyncio.create_task(
+        _autoscan_loop(interval_sec, broker_name, symbol)
+    )
+    return {"started": True, "interval_sec": interval_sec, "symbol": symbol}
+
+
+@app.post("/api/autoscan/stop")
+async def api_autoscan_stop():
+    """Stop the auto-scan loop."""
+    global _autoscan_task
+    if not _autoscan_state["running"]:
+        raise HTTPException(status_code=400, detail="Auto-scan is not running")
+
+    _autoscan_state["running"] = False
+    if _autoscan_task and not _autoscan_task.done():
+        _autoscan_task.cancel()
+    _autoscan_task = None
+    return {"stopped": True}
+
+
+@app.get("/api/autoscan/status")
+async def api_autoscan_status():
+    """Get auto-scan loop status."""
+    return _autoscan_state
 
 
 # ─────────────────────────────────────────────────────────────────────────────

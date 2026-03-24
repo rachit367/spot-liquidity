@@ -46,7 +46,7 @@ def run_real_backtest(
     rr_ratio:        float = 2.0,
     risk_pct:        float = 1.0,
     initial_balance: float = 100_000.0,
-    fetch_count:     int   = 500,   # total candles to fetch from broker
+    fetch_count:     int   = 2000,  # total candles to fetch from broker
 ) -> dict:
     """
     Fetch historical OHLC, walk forward, run the ICT strategy on each window,
@@ -117,7 +117,7 @@ def run_real_backtest(
         qty        = max(1, risk_mgr.compute_quantity(
             balance, risk_pct, signal.entry, signal.stop_loss,
         ))
-        risk_amount = risk
+        risk_amount = abs(signal.entry - signal.stop_loss) or 1.0
 
         if signal.direction == "long":
             pnl_abs = (exit_price - signal.entry) * qty

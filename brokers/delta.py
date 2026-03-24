@@ -119,31 +119,83 @@ class DeltaBroker(BaseBroker):
         result = data.get("result", {})
         return float(result.get("mark_price") or result.get("close", 0))
 
-    @retry()
-    def get_ohlc(
-        self, symbol: str, interval: str = "1d", count: int = 30
-    ) -> pd.DataFrame:
-        path = "/history/candles"
-        now = int(time.time())
-        # Map interval strings to seconds for start time calculation
-        interval_seconds = {
-            "1m": 60, "5m": 300, "15m": 900, "30m": 1800,
-            "1h": 3600, "4h": 14400, "1d": 86400, "1w": 604800,
-        }
-        period = interval_seconds.get(interval, 86400)
-        start = now - (count * period)
+    # Map interval strings to seconds
+    INTERVAL_SECONDS = {
+        "1m": 60, "5m": 300, "15m": 900, "30m": 1800,
+        "1h": 3600, "4h": 14400, "1d": 86400, "1w": 604800,
+    }
+    MAX_CANDLES_PER_REQUEST = 2000
 
+    @retry()
+    def _fetch_candle_page(
+        self, symbol: str, interval: str, start: int, end: int,
+    ) -> list[dict]:
+        """Fetch a single page of candles between start and end timestamps."""
+        path = "/history/candles"
         url = self._url(path)
         params = {
             "resolution": interval,
             "symbol": symbol,
             "start": start,
-            "end": now,
+            "end": end,
         }
         resp = self._session.get(url, params=params)
         data = self._check(resp, url)
-        candles = data.get("result", [])
+        return data.get("result", [])
 
+    def get_ohlc(
+        self, symbol: str, interval: str = "1d", count: int = 30
+    ) -> pd.DataFrame:
+        """
+        Fetch ``count`` OHLCV candles, automatically paginating if needed.
+
+        Delta Exchange returns at most ~2000 candles per request.
+        For larger requests this method walks backward in time, fetching
+        in chunks and combining the results.
+        """
+        period = self.INTERVAL_SECONDS.get(interval, 86400)
+        now = int(time.time())
+
+        if count <= self.MAX_CANDLES_PER_REQUEST:
+            # Single request — fast path
+            start = now - (count * period)
+            raw = self._fetch_candle_page(symbol, interval, start, now)
+            return self._candles_to_df(raw)
+
+        # ── Paginated fetch (walk backward in time) ──────────────────────
+        all_candles: list[dict] = []
+        chunk_end = now
+        remaining = count
+
+        while remaining > 0:
+            chunk_size = min(remaining, self.MAX_CANDLES_PER_REQUEST)
+            chunk_start = chunk_end - (chunk_size * period)
+
+            raw = self._fetch_candle_page(symbol, interval, chunk_start, chunk_end)
+            if not raw:
+                break   # no more history available
+
+            all_candles.extend(raw)
+            remaining -= len(raw)
+
+            # Move window further back
+            chunk_end = chunk_start
+            if len(raw) < chunk_size:
+                break   # reached the oldest available candle
+
+            # Small delay to respect rate limits
+            time.sleep(0.5)
+
+        logger.info(
+            "Paginated fetch: %d candles for %s/%s (%d requests)",
+            len(all_candles), symbol, interval,
+            (count - remaining + self.MAX_CANDLES_PER_REQUEST - 1) // self.MAX_CANDLES_PER_REQUEST,
+        )
+        return self._candles_to_df(all_candles)
+
+    @staticmethod
+    def _candles_to_df(candles: list[dict]) -> pd.DataFrame:
+        """Convert raw API candle dicts to a deduplicated, sorted DataFrame."""
         rows = []
         for c in candles:
             rows.append({
@@ -154,7 +206,11 @@ class DeltaBroker(BaseBroker):
                 "close": float(c.get("close", c.get("c", 0))),
                 "volume": float(c.get("volume", c.get("v", 0))),
             })
-        return pd.DataFrame(rows)
+        if not rows:
+            return pd.DataFrame(columns=["timestamp", "open", "high", "low", "close", "volume"])
+        df = pd.DataFrame(rows)
+        df = df.drop_duplicates(subset=["timestamp"]).sort_values("timestamp").reset_index(drop=True)
+        return df
 
     @retry()
     def get_balance(self) -> float:

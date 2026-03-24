@@ -931,3 +931,63 @@ tbody td {
 /* ── Danger button hover ───────────────────────────────────────────────── */
 .btn-danger:hover:not(:disabled) { opacity: .85; }
 
+/* ── Auto-scan controls ────────────────────────────────────────────────── */
+.autoscan-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+
+.autoscan-controls select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+}
+
+.btn-auto {
+  background: rgba(188,140,255,.2);
+  color: var(--purple);
+  border-color: rgba(188,140,255,.3);
+  font-size: 12px;
+  padding: 5px 12px;
+}
+.btn-auto:hover:not(:disabled) { background: rgba(188,140,255,.35); }
+
+.btn-sm {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.autoscan-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(63,185,80,.08);
+  border: 1px solid rgba(63,185,80,.2);
+  border-radius: 20px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 1.5s infinite;
+}
+
+.autoscan-stats {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  white-space: nowrap;
+}

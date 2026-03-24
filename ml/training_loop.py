@@ -98,18 +98,23 @@ class TrainingLoop:
 
     def start(
         self,
-        duration_hours:     float = 2.0,
-        symbols:            str   = "BTCUSD",
-        interval:           str   = "15m",
-        fetch_count:        int   = 500,
-        fetch_interval_sec: int   = 300,
-        retrain_every:      int   = 50,
-        broker_name:        str   = "delta",
+        duration_hours:       float = 2.0,
+        symbols:              str   = "BTCUSD",
+        interval:             str   = "15m",
+        fetch_count:          int   = 2000,
+        fetch_interval_sec:   int   = 300,
+        retrain_every:        int   = 50,
+        broker_name:          str   = "delta",
+        deep_history_candles: int   = 50_000,
     ) -> dict:
         """Start the training loop in a background thread.
 
         Parameters
         ----------
+        deep_history_candles : How many candles to fetch on the FIRST epoch.
+            This bootstraps training on as much historical data as possible.
+            Subsequent epochs use ``fetch_count`` for fresh recent data.
+            Set to 0 to disable deep-history bootstrap.
         symbols : Comma-separated list of symbols (e.g. "BTCUSD,ETHUSD,SOLUSD")
         """
         if self.state.running:
@@ -130,7 +135,8 @@ class TrainingLoop:
         self._thread = threading.Thread(
             target=self._run_loop,
             args=(duration_hours, symbols, interval, fetch_count,
-                  fetch_interval_sec, retrain_every, broker_name),
+                  fetch_interval_sec, retrain_every, broker_name,
+                  deep_history_candles),
             daemon=True,
             name="training-loop",
         )
@@ -188,13 +194,14 @@ class TrainingLoop:
 
     def _run_loop(
         self,
-        duration_hours:     float,
-        symbols:            str,
-        interval:           str,
-        fetch_count:        int,
-        fetch_interval_sec: int,
-        retrain_every:      int,
-        broker_name:        str,
+        duration_hours:       float,
+        symbols:              str,
+        interval:             str,
+        fetch_count:          int,
+        fetch_interval_sec:   int,
+        retrain_every:        int,
+        broker_name:          str,
+        deep_history_candles: int = 50_000,
     ) -> None:
         """Main training loop, runs in a background thread."""
         end_time = time.monotonic() + (duration_hours * 3600)
@@ -245,8 +252,18 @@ class TrainingLoop:
             strategy = strategies[current_symbol]
 
             # ── Fetch OHLCV ──────────────────────────────────────────────
+            # First epoch: fetch maximum historical data to bootstrap training
+            is_first_epoch = (s.epoch == 1 and deep_history_candles > 0)
+            candles_to_fetch = deep_history_candles if is_first_epoch else fetch_count
+            if is_first_epoch:
+                logger.info(
+                    "Deep history fetch: requesting %d candles for %s",
+                    candles_to_fetch, current_symbol,
+                )
             try:
-                df_raw = broker.get_ohlc(current_symbol, interval, count=fetch_count)
+                df_raw = broker.get_ohlc(
+                    current_symbol, interval, count=candles_to_fetch
+                )
                 s.consecutive_errors = 0
                 s.last_error = ""
             except Exception as exc:

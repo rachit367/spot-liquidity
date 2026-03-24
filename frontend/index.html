@@ -31,6 +31,21 @@
 
   <div class="spinner" id="scan-spin"></div>
   <button class="btn btn-success" id="scan-btn">&#9654; Scan Signal</button>
+
+  <div class="autoscan-controls">
+    <select id="autoscan-interval" title="Auto-scan interval">
+      <option value="30">30s</option>
+      <option value="60" selected>1 min</option>
+      <option value="120">2 min</option>
+      <option value="300">5 min</option>
+    </select>
+    <button class="btn btn-auto" id="autoscan-start-btn" title="Start auto-scanning">&#9654; Auto</button>
+    <button class="btn btn-danger btn-sm" id="autoscan-stop-btn" disabled title="Stop auto-scanning">■ Stop</button>
+    <div class="autoscan-indicator" id="autoscan-indicator" style="display:none">
+      <span class="pulse-dot"></span>
+      <span class="autoscan-stats" id="autoscan-stats">0 scans</span>
+    </div>
+  </div>
 </header>
 
 <!-- ── Toast container ───────────────────────────────────────────────── -->
@@ -242,6 +257,25 @@
           </select>
         </div>
         <div class="field-group">
+          <label class="field-label" title="Candles fetched on first epoch to bootstrap training on years of data">Deep History</label>
+          <select class="field-input" id="train-deep-history">
+            <option value="0">Off</option>
+            <option value="10000">10 K</option>
+            <option value="25000">25 K</option>
+            <option value="50000" selected>50 K</option>
+            <option value="100000">100 K</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label" title="Candles fetched on every subsequent epoch">Candles/Cycle</label>
+          <select class="field-input" id="train-fetch-count">
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+            <option value="2000" selected>2000</option>
+            <option value="5000">5000</option>
+          </select>
+        </div>
+        <div class="field-group">
           <label class="field-label">Fetch Every</label>
           <select class="field-input" id="train-fetch-sec">
             <option value="60">1 min</option>
@@ -255,6 +289,7 @@
           <input class="field-input" id="train-retrain-every" type="number" value="50" min="5" max="500" step="5" />
           <span class="field-hint">trades</span>
         </div>
+
       </div>
 
       <!-- Progress section -->

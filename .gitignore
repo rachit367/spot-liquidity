@@ -22,6 +22,7 @@ logs/trades_ml.csv
 # ML models
 models/*/bundle.pkl
 models/latest
+models/
 
 # Build / packaging
 build/

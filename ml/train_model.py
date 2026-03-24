@@ -107,7 +107,14 @@ def evaluate(model: Any, X_test: np.ndarray, y_test: np.ndarray,
     )
 
     y_pred  = model.predict(X_test)
-    y_proba = model.predict_proba(X_test)[:, 1]
+
+    # predict_proba may return 1 column when trained on a single class
+    proba = model.predict_proba(X_test)
+    if proba.shape[1] >= 2:
+        y_proba = proba[:, 1]
+    else:
+        # Model only knows one class — use constant probability
+        y_proba = np.zeros(len(y_test))
 
     acc  = float(accuracy_score(y_test, y_pred))
     prec = float(precision_score(y_test, y_pred, zero_division=0))
@@ -118,7 +125,7 @@ def evaluate(model: Any, X_test: np.ndarray, y_test: np.ndarray,
     except ValueError:
         auc = 0.5
 
-    cm = confusion_matrix(y_test, y_pred).tolist()
+    cm = confusion_matrix(y_test, y_pred, labels=[0, 1]).tolist()
 
     # Feature importances (if supported)
     feat_imp = []
