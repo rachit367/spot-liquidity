@@ -2293,5 +2293,2165 @@
         "importance": 0.0
       }
     ]
+  },
+  {
+    "version": 18,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T13:19:00.320441+00:00",
+    "importances": [
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0565
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0542
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0527
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0491
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0456
+      },
+      {
+        "name": "body_ratio",
+        "importance": 0.0453
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0452
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0445
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0442
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0434
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0416
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0409
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0404
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0397
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0393
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0364
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0359
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0343
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0341
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0338
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0333
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0321
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0182
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0159
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.011
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0105
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0087
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0048
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0048
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0035
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 19,
+    "model_name": "lightgbm",
+    "timestamp": "2026-03-26T13:28:27.661796+00:00",
+    "importances": [
+      {
+        "name": "prev_close_chg",
+        "importance": 139.0
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 139.0
+      },
+      {
+        "name": "rsi_14",
+        "importance": 119.0
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 119.0
+      },
+      {
+        "name": "body_ratio",
+        "importance": 112.0
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 111.0
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 108.0
+      },
+      {
+        "name": "trend_strength",
+        "importance": 100.0
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 92.0
+      },
+      {
+        "name": "trend_slope",
+        "importance": 86.0
+      },
+      {
+        "name": "obv_slope",
+        "importance": 85.0
+      },
+      {
+        "name": "vol_delta",
+        "importance": 76.0
+      },
+      {
+        "name": "vol_spike",
+        "importance": 73.0
+      },
+      {
+        "name": "macd_hist",
+        "importance": 72.0
+      },
+      {
+        "name": "atr_pct",
+        "importance": 71.0
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 71.0
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 61.0
+      },
+      {
+        "name": "bb_width",
+        "importance": 61.0
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 50.0
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 50.0
+      },
+      {
+        "name": "ll_count",
+        "importance": 40.0
+      },
+      {
+        "name": "hh_count",
+        "importance": 38.0
+      },
+      {
+        "name": "vol_trend",
+        "importance": 35.0
+      },
+      {
+        "name": "rel_volume",
+        "importance": 31.0
+      },
+      {
+        "name": "risk_pct",
+        "importance": 20.0
+      },
+      {
+        "name": "hour_sin",
+        "importance": 8.0
+      },
+      {
+        "name": "hour_cos",
+        "importance": 7.0
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 3.0
+      },
+      {
+        "name": "day_sin",
+        "importance": 3.0
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 20,
+    "model_name": "lightgbm",
+    "timestamp": "2026-03-26T13:32:44.557593+00:00",
+    "importances": [
+      {
+        "name": "vol_price_corr",
+        "importance": 191.0
+      },
+      {
+        "name": "rsi_14",
+        "importance": 150.0
+      },
+      {
+        "name": "macd_hist",
+        "importance": 118.0
+      },
+      {
+        "name": "trend_strength",
+        "importance": 118.0
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 115.0
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 114.0
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 112.0
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 111.0
+      },
+      {
+        "name": "atr_pct",
+        "importance": 105.0
+      },
+      {
+        "name": "body_ratio",
+        "importance": 90.0
+      },
+      {
+        "name": "vol_delta",
+        "importance": 80.0
+      },
+      {
+        "name": "obv_slope",
+        "importance": 72.0
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 71.0
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 70.0
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 64.0
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 57.0
+      },
+      {
+        "name": "bb_width",
+        "importance": 55.0
+      },
+      {
+        "name": "trend_slope",
+        "importance": 55.0
+      },
+      {
+        "name": "vol_spike",
+        "importance": 55.0
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 51.0
+      },
+      {
+        "name": "vol_trend",
+        "importance": 38.0
+      },
+      {
+        "name": "ll_count",
+        "importance": 33.0
+      },
+      {
+        "name": "hh_count",
+        "importance": 28.0
+      },
+      {
+        "name": "risk_pct",
+        "importance": 28.0
+      },
+      {
+        "name": "rel_volume",
+        "importance": 22.0
+      },
+      {
+        "name": "hour_sin",
+        "importance": 15.0
+      },
+      {
+        "name": "hour_cos",
+        "importance": 5.0
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 2.0
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 21,
+    "model_name": "lightgbm",
+    "timestamp": "2026-03-26T13:37:53.090802+00:00",
+    "importances": [
+      {
+        "name": "prev_close_chg",
+        "importance": 146.0
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 127.0
+      },
+      {
+        "name": "trend_strength",
+        "importance": 126.0
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 123.0
+      },
+      {
+        "name": "vol_delta",
+        "importance": 114.0
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 112.0
+      },
+      {
+        "name": "atr_pct",
+        "importance": 109.0
+      },
+      {
+        "name": "body_ratio",
+        "importance": 109.0
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 87.0
+      },
+      {
+        "name": "macd_hist",
+        "importance": 77.0
+      },
+      {
+        "name": "obv_slope",
+        "importance": 75.0
+      },
+      {
+        "name": "rsi_14",
+        "importance": 74.0
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 74.0
+      },
+      {
+        "name": "trend_slope",
+        "importance": 72.0
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 71.0
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 68.0
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 61.0
+      },
+      {
+        "name": "bb_width",
+        "importance": 57.0
+      },
+      {
+        "name": "vol_spike",
+        "importance": 56.0
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 43.0
+      },
+      {
+        "name": "vol_trend",
+        "importance": 28.0
+      },
+      {
+        "name": "hh_count",
+        "importance": 24.0
+      },
+      {
+        "name": "risk_pct",
+        "importance": 22.0
+      },
+      {
+        "name": "ll_count",
+        "importance": 17.0
+      },
+      {
+        "name": "hour_sin",
+        "importance": 16.0
+      },
+      {
+        "name": "hour_cos",
+        "importance": 9.0
+      },
+      {
+        "name": "rel_volume",
+        "importance": 5.0
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 1.0
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 22,
+    "model_name": "lightgbm",
+    "timestamp": "2026-03-26T13:47:18.410287+00:00",
+    "importances": [
+      {
+        "name": "trend_strength",
+        "importance": 168.0
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 143.0
+      },
+      {
+        "name": "atr_pct",
+        "importance": 139.0
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 135.0
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 131.0
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 105.0
+      },
+      {
+        "name": "body_ratio",
+        "importance": 101.0
+      },
+      {
+        "name": "vol_delta",
+        "importance": 101.0
+      },
+      {
+        "name": "rsi_14",
+        "importance": 94.0
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 92.0
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 82.0
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 75.0
+      },
+      {
+        "name": "trend_slope",
+        "importance": 72.0
+      },
+      {
+        "name": "bb_width",
+        "importance": 66.0
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 64.0
+      },
+      {
+        "name": "obv_slope",
+        "importance": 62.0
+      },
+      {
+        "name": "macd_hist",
+        "importance": 60.0
+      },
+      {
+        "name": "vol_spike",
+        "importance": 58.0
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 43.0
+      },
+      {
+        "name": "hh_count",
+        "importance": 41.0
+      },
+      {
+        "name": "hour_sin",
+        "importance": 39.0
+      },
+      {
+        "name": "vol_trend",
+        "importance": 34.0
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 32.0
+      },
+      {
+        "name": "ll_count",
+        "importance": 30.0
+      },
+      {
+        "name": "risk_pct",
+        "importance": 17.0
+      },
+      {
+        "name": "rel_volume",
+        "importance": 16.0
+      },
+      {
+        "name": "hour_cos",
+        "importance": 8.0
+      },
+      {
+        "name": "day_sin",
+        "importance": 3.0
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 1.0
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 23,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T14:11:19.883963+00:00",
+    "importances": [
+      {
+        "name": "body_ratio",
+        "importance": 0.0988
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0606
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0596
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.052
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0501
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0473
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0471
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0451
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0396
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0382
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.037
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0364
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0358
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0355
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0307
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0306
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0302
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0284
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0274
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0238
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0229
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.022
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0212
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0192
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0176
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0176
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0121
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0062
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0049
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0022
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 24,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T14:19:45.700586+00:00",
+    "importances": [
+      {
+        "name": "body_ratio",
+        "importance": 0.0948
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.061
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0542
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0491
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0467
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0456
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0455
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0413
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0399
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0396
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0374
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0363
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0332
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0329
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0328
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0324
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0314
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.031
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0298
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0256
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0252
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0251
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.025
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0241
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0185
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.015
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0113
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0093
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0046
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0015
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 25,
+    "model_name": "xgboost",
+    "timestamp": "2026-03-26T14:29:11.141848+00:00",
+    "importances": [
+      {
+        "name": "bb_width",
+        "importance": 0.0543
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0468
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0459
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0456
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0444
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0441
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0417
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0411
+      },
+      {
+        "name": "body_ratio",
+        "importance": 0.0404
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.036
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0353
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0353
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0343
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0333
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0315
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0315
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0314
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0307
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0304
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.03
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.03
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0293
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0291
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0281
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.028
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0276
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.026
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0242
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0137
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 26,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T14:38:39.002793+00:00",
+    "importances": [
+      {
+        "name": "body_ratio",
+        "importance": 0.0829
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.07
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0562
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0543
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0535
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0484
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0443
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0421
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0405
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0383
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0368
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0348
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0336
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0334
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0291
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0282
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0282
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0277
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0274
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0271
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0267
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.025
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0237
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0232
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0195
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0152
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0115
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0098
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0069
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0019
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 27,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T14:51:12.200852+00:00",
+    "importances": [
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0769
+      },
+      {
+        "name": "body_ratio",
+        "importance": 0.0709
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0619
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0566
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.056
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0498
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0425
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0404
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0396
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0389
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0386
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0354
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0333
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0316
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0305
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0295
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0285
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0285
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.028
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0262
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0246
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0242
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.024
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0226
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0225
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0109
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0103
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0089
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0067
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0015
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 28,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T15:01:42.116089+00:00",
+    "importances": [
+      {
+        "name": "body_ratio",
+        "importance": 0.0943
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0721
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.061
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0562
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0492
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0477
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0444
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.043
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0404
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0403
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0376
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0363
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0316
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0313
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0306
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0305
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.03
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0299
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0297
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0258
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0221
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0219
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0217
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0209
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0178
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0097
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0093
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0091
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0038
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0018
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 29,
+    "model_name": "xgboost",
+    "timestamp": "2026-03-26T15:11:07.811577+00:00",
+    "importances": [
+      {
+        "name": "bb_width",
+        "importance": 0.0658
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0529
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0484
+      },
+      {
+        "name": "body_ratio",
+        "importance": 0.0475
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0467
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0432
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0421
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0396
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.039
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0349
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0339
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0335
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0334
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0331
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0328
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0322
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0321
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0309
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0303
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0292
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0292
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0283
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0276
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0237
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0233
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0231
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0218
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0208
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.018
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0027
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 30,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T15:18:27.003734+00:00",
+    "importances": [
+      {
+        "name": "body_ratio",
+        "importance": 0.0907
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0869
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0609
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0579
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0476
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0412
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0411
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0403
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0402
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.039
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0388
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0363
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0359
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0331
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0308
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0308
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0298
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0274
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.026
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0244
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0244
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0222
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0201
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0195
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0191
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0109
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0108
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0093
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0028
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0017
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 31,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T16:48:46.149806+00:00",
+    "importances": [
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0784
+      },
+      {
+        "name": "body_ratio",
+        "importance": 0.076
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0716
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0577
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0526
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0445
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0419
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0391
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0384
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0362
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0347
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0338
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0338
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0335
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0307
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0286
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.028
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0278
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0275
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0267
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0267
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0252
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0232
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0232
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0191
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0139
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0106
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0099
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0043
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0024
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 32,
+    "model_name": "xgboost",
+    "timestamp": "2026-03-26T16:49:01.823745+00:00",
+    "importances": [
+      {
+        "name": "hh_count",
+        "importance": 0.0555
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0522
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0489
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.0468
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0453
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0433
+      },
+      {
+        "name": "body_ratio",
+        "importance": 0.0419
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0384
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.0383
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0379
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0363
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0347
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.034
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0317
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0309
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0306
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0284
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0279
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0277
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0273
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.0263
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0261
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0259
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0258
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0252
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.025
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0247
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0221
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0212
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0195
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
+  },
+  {
+    "version": 33,
+    "model_name": "random_forest",
+    "timestamp": "2026-03-26T16:49:50.599300+00:00",
+    "importances": [
+      {
+        "name": "body_ratio",
+        "importance": 0.0848
+      },
+      {
+        "name": "vol_price_corr",
+        "importance": 0.076
+      },
+      {
+        "name": "bb_width",
+        "importance": 0.0668
+      },
+      {
+        "name": "atr_pct",
+        "importance": 0.0606
+      },
+      {
+        "name": "ema_dist_50",
+        "importance": 0.0441
+      },
+      {
+        "name": "close_vs_ob_mid",
+        "importance": 0.0431
+      },
+      {
+        "name": "vol_concentration",
+        "importance": 0.0429
+      },
+      {
+        "name": "hh_count",
+        "importance": 0.0392
+      },
+      {
+        "name": "ob_width_atr",
+        "importance": 0.0378
+      },
+      {
+        "name": "risk_pct",
+        "importance": 0.0377
+      },
+      {
+        "name": "vol_delta",
+        "importance": 0.0367
+      },
+      {
+        "name": "trend_slope",
+        "importance": 0.0348
+      },
+      {
+        "name": "sweep_depth",
+        "importance": 0.0337
+      },
+      {
+        "name": "trend_strength",
+        "importance": 0.0335
+      },
+      {
+        "name": "obv_slope",
+        "importance": 0.0334
+      },
+      {
+        "name": "macd_hist",
+        "importance": 0.0314
+      },
+      {
+        "name": "ema_dist_20",
+        "importance": 0.0304
+      },
+      {
+        "name": "prev_close_chg",
+        "importance": 0.028
+      },
+      {
+        "name": "rsi_14",
+        "importance": 0.0271
+      },
+      {
+        "name": "hour_sin",
+        "importance": 0.0249
+      },
+      {
+        "name": "hour_cos",
+        "importance": 0.0241
+      },
+      {
+        "name": "rel_volume",
+        "importance": 0.0229
+      },
+      {
+        "name": "vol_trend",
+        "importance": 0.0219
+      },
+      {
+        "name": "vwap_dist",
+        "importance": 0.0215
+      },
+      {
+        "name": "vol_spike",
+        "importance": 0.0197
+      },
+      {
+        "name": "day_cos",
+        "importance": 0.013
+      },
+      {
+        "name": "ll_count",
+        "importance": 0.0123
+      },
+      {
+        "name": "day_sin",
+        "importance": 0.0101
+      },
+      {
+        "name": "price_in_ob",
+        "importance": 0.0039
+      },
+      {
+        "name": "rr_ratio",
+        "importance": 0.0039
+      },
+      {
+        "name": "fvg_size_atr",
+        "importance": 0.0
+      },
+      {
+        "name": "kill_zone",
+        "importance": 0.0
+      }
+    ]
   }
 ]
